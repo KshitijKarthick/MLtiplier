@@ -27,4 +27,4 @@ RUN cd /app/config_manager && poetry install && \
 EXPOSE 9000
 WORKDIR /app/app_server
 
-CMD ["sleep", "1000"]
+CMD ["uvicorn", "app_server.main:app", "--host", "0.0.0.0", "--port", "9000"]

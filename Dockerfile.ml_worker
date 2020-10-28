@@ -26,4 +26,4 @@ RUN cd /app/config_manager && poetry install && \
 
 WORKDIR /app/ml_worker
 
-CMD ["sleep", "1000"]
+CMD ["python", "ml_worker/worker.py"]
