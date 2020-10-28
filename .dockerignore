@@ -1,0 +1,9 @@
+# project
+ml_worker/model_resources
+ml_worker/stub
+ml_worker/logs
+queue_manager/data
+queue_manager/logs
+web_server/logs
+node_modules
+venv
