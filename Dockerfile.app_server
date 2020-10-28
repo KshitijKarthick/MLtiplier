@@ -1,0 +1,30 @@
+FROM tiangolo/uvicorn-gunicorn:python3.8-slim
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN pip install --upgrade pip wheel poetry setuptools
+
+COPY config_manager/pyproject.toml config_manager/poetry.toml config_manager/poetry.lock /app/config_manager/
+
+RUN cd /app/config_manager/ && \
+    poetry install --no-root
+
+COPY queue_manager/pyproject.toml queue_manager/poetry.toml queue_manager/poetry.lock /app/queue_manager/
+
+RUN cd /app/queue_manager/ && \
+    poetry install --no-root
+
+COPY app_server/pyproject.toml app_server/poetry.toml app_server/poetry.lock /app/app_server/
+
+RUN cd /app/app_server/ && \
+    poetry install --no-root
+
+COPY config_manager/config_manager /app/config_manager/config_manager
+COPY queue_manager/queue_manager /app/queue_manager/queue_manager
+RUN cd /app/config_manager && poetry install && \
+    cd /app/queue_manager && poetry install
+
+EXPOSE 9000
+WORKDIR /app/app_server
+
+CMD ["sleep", "1000"]
