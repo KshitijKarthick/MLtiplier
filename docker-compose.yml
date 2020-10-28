@@ -1,0 +1,53 @@
+version: '3'
+services:
+  app_server:
+    build:
+      context: .
+      dockerfile: Dockerfile.app_server
+    depends_on:
+      - redis
+    networks:
+      - web
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./config_manager/config_manager:/app/config_manager/config_manager
+      - ./queue_manager/queue_manager:/app/queue_manager/queue_manager
+
+  web_server:
+    image: nginx
+    networks:
+      - web
+    depends_on:
+      - app_server
+    ports:
+      - "80:80"
+    volumes:
+      - ./web_server/nginx.conf:/etc/nginx/nginx.conf
+#      - ./dist:/usr/share/nginx/html/
+      - ./web_server/logs:/usr/share/nginx/logs/
+
+  redis:
+    image: redis
+    networks:
+      - web
+    volumes:
+      - ./redis/data/:/data/
+    ports:
+      - "6379:6379"
+
+  ml_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.ml_worker
+    depends_on:
+      - redis
+    networks:
+      - web
+    volumes:
+      - ./config_manager/config_manager:/app/config_manager/config_manager
+      - ./queue_manager/queue_manager:/app/queue_manager/queue_manager
+
+networks:
+  web:
+    external: true
