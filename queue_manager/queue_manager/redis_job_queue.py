@@ -4,8 +4,8 @@ import time
 from dataclasses import asdict
 
 from redis import Redis
-from config_manager.config_manager.job import Job, JobStatus, ImageViewerInput, JobStatusState
-from config_manager.config_manager.commons import USER_UPLOAD_PATH, INPUT_IMAGE_NAME
+from config_manager.job import Job, JobStatus, ImageViewerInput, JobStatusState
+from config_manager.commons import USER_UPLOAD_PATH, INPUT_IMAGE_NAME
 
 
 class RedisJobQueue:

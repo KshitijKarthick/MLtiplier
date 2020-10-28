@@ -1,6 +1,6 @@
 import json
-from config_manager.config_manager.job import JOB_QUEUE_NAME, Job, JobStatus, JobStatusState
-from config_manager.config_manager.redis import HOST
+from config_manager.job import JOB_QUEUE_NAME, Job, JobStatus, JobStatusState
+from config_manager.redis import HOST
 from dataclasses import asdict
 from uuid import uuid4
 from redis import Redis
