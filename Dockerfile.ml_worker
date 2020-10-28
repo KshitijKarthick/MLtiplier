@@ -1,0 +1,29 @@
+FROM python:3.7.9-buster
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN pip install --upgrade pip wheel poetry setuptools
+
+COPY config_manager/pyproject.toml config_manager/poetry.toml config_manager/poetry.lock /app/config_manager/
+
+RUN cd /app/config_manager/ && \
+    poetry install --no-root
+
+COPY queue_manager/pyproject.toml queue_manager/poetry.toml queue_manager/poetry.lock /app/queue_manager/
+
+RUN cd /app/queue_manager/ && \
+    poetry install --no-root
+
+COPY ml_worker/poetry.lock ml_worker/pyproject.toml ml_worker/poetry.toml /app/ml_worker/
+
+RUN cd /app/ml_worker/ && \
+    poetry install --no-root
+
+COPY config_manager/config_manager /app/config_manager/config_manager
+COPY queue_manager/queue_manager /app/queue_manager/queue_manager
+RUN cd /app/config_manager && poetry install && \
+    cd /app/queue_manager && poetry install
+
+WORKDIR /app/ml_worker
+
+CMD ["sleep", "1000"]
