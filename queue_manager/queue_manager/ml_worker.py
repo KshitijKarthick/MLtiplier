@@ -4,11 +4,11 @@ import time
 from dataclasses import asdict
 
 from redis import Redis
-from config_manager.job import Job, JobStatus, ImageViewerInput, JobStatusState
+from config_manager.schema import Job, JobStatus, MLWorkerPayload, JobStatusState
 from config_manager.commons import USER_UPLOAD_PATH, INPUT_IMAGE_NAME
 
 
-class RedisJobQueue:
+class MLWorkerQueueManager:
     def __init__(self, host, queue_name, job_fn, polling_interval=1,
                  job_status_timeout=60*60, max_retries=3, logger=logging):
         self.redis = Redis(host)
@@ -48,7 +48,7 @@ class RedisJobQueue:
                     self.logger.info(f'Job: {job.job_id} completed')
                     job_status = JobStatus(
                         job_id=job.job_id, status=JobStatusState.SUCCESS,
-                        payload=ImageViewerInput(
+                        payload=MLWorkerPayload(
                             target=str(USER_UPLOAD_PATH / job.image_dir_name /
                                    job.high_res_image_name),
                             source=str(USER_UPLOAD_PATH / job.image_dir_name / INPUT_IMAGE_NAME),

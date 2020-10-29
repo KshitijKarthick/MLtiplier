@@ -1,12 +1,13 @@
 import json
-from config_manager.job import JOB_QUEUE_NAME, Job, JobStatus, JobStatusState
+from config_manager.job import JOB_QUEUE_NAME
+from config_manager.schema import Job, JobStatus, JobStatusState
 from config_manager.redis import HOST
 from dataclasses import asdict
 from uuid import uuid4
 from redis import Redis
 
 
-class RedisJobProducer:
+class AppServerQueueManager:
     def __init__(self, host=HOST, job_queue_name=JOB_QUEUE_NAME):
         self.redis = Redis(host)
         self.job_queue_name = job_queue_name
@@ -14,7 +15,7 @@ class RedisJobProducer:
 
     def submit(self, payload):
         job_id = uuid4().hex
-        job = Job(**{'job_id': job_id, **payload})
+        job = Job(**{'job_id': job_id, 'payload': payload})
         self.redis.rpush(self.job_queue_name, self._marshall(asdict(job)))
         self.redis.rpush(self.job_queue_ids_name, job_id)
         return job_id
