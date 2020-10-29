@@ -5,7 +5,7 @@ from config_manager.schema import MLWorkerResult, MLWorkerInput
 logger = get_logger()
 
 
-def job(params: MLWorkerInput) -> MLWorkerResult:
+def job(_: MLWorkerInput) -> MLWorkerResult:
     return MLWorkerResult()
 
 

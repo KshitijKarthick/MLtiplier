@@ -23,10 +23,10 @@ class MLWorkerQueueManager:
         job_fn: Callable,
         host: AnyStr = HOST,
         queue_name: AnyStr = JOB_QUEUE_NAME,
-        polling_interval=1,
-        job_status_timeout=60 * 60,
-        max_retries=3,
-        logger=logging,
+        polling_interval: int = 1,
+        job_status_timeout: int = 60 * 60,
+        max_retries: int = 3,
+        logger: logging.Logger = logging,
     ):
         self.redis = Redis(host)
         self.queue_name = queue_name
@@ -46,14 +46,14 @@ class MLWorkerQueueManager:
             parsed_message["payload"] = MLWorkerInput(**parsed_message["payload"])
             return Job(**parsed_message)
 
-    def insert_job_at_end(self, job):
-        self.redis.rpush(json.dumps(asdict(job)))
+    def insert_job_at_end(self, job: Job) -> int:
+        return self.redis.rpush(json.dumps(asdict(job)))
 
-    def insert_job_at_start(self, job):
-        self.redis.lpush(json.dumps(asdict(job)))
+    def insert_job_at_start(self, job: Job) -> int:
+        return self.redis.lpush(json.dumps(asdict(job)))
 
-    def set_job_status(self, job_status):
-        self.redis.setex(
+    def set_job_status(self, job_status: JobStatus) -> int:
+        return self.redis.setex(
             name=job_status.job_id,
             value=json.dumps(asdict(job_status)),
             time=self.job_status_timeout,
@@ -61,11 +61,11 @@ class MLWorkerQueueManager:
 
     def run(
         self,
-        indefinite_wait=True,
-        max_connection_errors=5,
-        connection_error_secs=5,
-        redis_error_secs=1,
-    ):
+        indefinite_wait: bool = True,
+        max_connection_errors: int = 5,
+        connection_error_secs: int = 5,
+        redis_error_secs: int = 1,
+    ) -> None:
         redis_error_count = 0
         while True:
             try:

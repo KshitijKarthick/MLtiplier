@@ -1,5 +1,5 @@
 import json
-from typing import AnyStr, Dict
+from typing import AnyStr, Dict, Optional
 
 from config_manager.job import JOB_QUEUE_NAME
 from config_manager.schema import Job, JobStatus, JobStatusState, MLWorkerInput
@@ -15,7 +15,7 @@ class AppServerQueueManager:
         self.job_queue_name = job_queue_name
         self.job_queue_ids_name = f"{job_queue_name}_ids"
 
-    def submit(self, ml_worker_payload: MLWorkerInput):
+    def submit(self, ml_worker_payload: MLWorkerInput) -> AnyStr:
         if not isinstance(ml_worker_payload, MLWorkerInput):
             raise ValueError(
                 f"Invalid type passed, expected MLWorkerPayload,"
@@ -28,11 +28,11 @@ class AppServerQueueManager:
         return job_id
 
     @staticmethod
-    def _unmarshall(value: AnyStr):
+    def _unmarshall(value: AnyStr) -> Optional[Dict]:
         return json.loads(value.decode("utf-8")) if value else None
 
     @staticmethod
-    def _marshall(value: Dict):
+    def _marshall(value: Dict) -> AnyStr:
         return json.dumps(value)
 
     def status(self, job_id: AnyStr) -> JobStatus:
