@@ -13,21 +13,23 @@ class AppServerQueueManager:
     def __init__(self, host: AnyStr = HOST, job_queue_name: AnyStr = JOB_QUEUE_NAME):
         self.redis = Redis(host)
         self.job_queue_name = job_queue_name
-        self.job_queue_ids_name = f'{job_queue_name}_ids'
+        self.job_queue_ids_name = f"{job_queue_name}_ids"
 
     def submit(self, ml_worker_payload: MLWorkerInput):
         if not isinstance(ml_worker_payload, MLWorkerInput):
-            raise ValueError(f'Invalid type passed, expected MLWorkerPayload,'
-                             f'received {type(ml_worker_payload)}')
+            raise ValueError(
+                f"Invalid type passed, expected MLWorkerPayload,"
+                f"received {type(ml_worker_payload)}"
+            )
         job_id = uuid4().hex
-        job = Job(**{'job_id': job_id, 'payload': ml_worker_payload})
+        job = Job(**{"job_id": job_id, "payload": ml_worker_payload})
         self.redis.rpush(self.job_queue_name, self._marshall(asdict(job)))
         self.redis.rpush(self.job_queue_ids_name, job_id)
         return job_id
 
     @staticmethod
     def _unmarshall(value: AnyStr):
-        return json.loads(value.decode('utf-8')) if value else None
+        return json.loads(value.decode("utf-8")) if value else None
 
     @staticmethod
     def _marshall(value: Dict):
@@ -41,6 +43,7 @@ class AppServerQueueManager:
             job_status = JobStatus(**job_status_dict)
             job_status.queue_length = queue_length
         else:
-            job_status = JobStatus(job_id=job_id, status=JobStatusState.PENDING,
-                                   queue_length=queue_length)
+            job_status = JobStatus(
+                job_id=job_id, status=JobStatusState.PENDING, queue_length=queue_length
+            )
         return job_status

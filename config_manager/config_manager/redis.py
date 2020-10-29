@@ -1,1 +1,1 @@
-HOST= 'redis'
+HOST = "redis"

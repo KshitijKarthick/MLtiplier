@@ -4,9 +4,9 @@ from typing import AnyStr, Optional, Tuple
 
 @dataclass
 class JobStatusState:
-    PENDING = 'pending'
-    FAILURE = 'failed'
-    SUCCESS = 'success'
+    PENDING = "pending"
+    FAILURE = "failed"
+    SUCCESS = "success"
 
 
 @dataclass

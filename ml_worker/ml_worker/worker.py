@@ -11,11 +11,12 @@ def job(params: MLWorkerInput) -> MLWorkerResult:
 
 def main():
     job_queue = MLWorkerQueueManager(
-        job_fn=job, logger=logger,
+        job_fn=job,
+        logger=logger,
     )
-    logger.info('Starting Job queue worker')
+    logger.info("Starting Job queue worker")
     job_queue.run(indefinite_wait=True)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

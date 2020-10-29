@@ -1,1 +1,1 @@
-JOB_QUEUE_NAME = 'jobs'
+JOB_QUEUE_NAME = "jobs"
