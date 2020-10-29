@@ -1,18 +1,18 @@
-from queue_manager.redis_job_queue import RedisJobQueue
-from config_manager.redis import HOST
-from config_manager.job import JOB_QUEUE_NAME
+from queue_manager.ml_worker import MLWorkerQueueManager
 from config_manager.utils import get_logger
+from config_manager.schema import MLWorkerResult, MLWorkerInput
 
 logger = get_logger()
 
 
-def job(*_, **__,):
-    return 'sample_result'
+def job(params: MLWorkerInput) -> MLWorkerResult:
+    return MLWorkerResult()
 
 
 def main():
-    job_queue = RedisJobQueue(host=HOST, queue_name=JOB_QUEUE_NAME,
-                              job_fn=job, logger=logger,)
+    job_queue = MLWorkerQueueManager(
+        job_fn=job, logger=logger,
+    )
     logger.info('Starting Job queue worker')
     job_queue.run(indefinite_wait=True)
 
