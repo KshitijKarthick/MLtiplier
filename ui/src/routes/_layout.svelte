@@ -1,13 +1,11 @@
 <script>
 	import Nav from '../components/Nav.svelte';
-
+	import TailwindGlobalStyle from '../components/TailwindGlobalStyle.svelte'
 	export let segment;
 </script>
 
 <style>
 	main {
-		position: relative;
-		max-width: 56em;
 		background-color: white;
 		padding: 2em;
 		margin: 0 auto;
@@ -16,7 +14,9 @@
 </style>
 
 <Nav {segment}/>
-
+<TailwindGlobalStyle />
 <main>
-	<slot></slot>
+	<div class="container mx-auto">
+		<slot></slot>
+	</div>
 </main>
