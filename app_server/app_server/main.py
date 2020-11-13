@@ -6,11 +6,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 from queue_manager.app_server import AppServerQueueManager
 from config_manager.commons import (
-    USER_UPLOAD_PATH,
-    MAX_ALLOWED_SIZE,
     DEBUG_MODE,
-    HIGH_RES_IMAGE_NAME,
-    INPUT_IMAGE_NAME,
 )
 from config_manager.utils import get_logger
 
