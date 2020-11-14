@@ -9,9 +9,9 @@ COPY config_manager/pyproject.toml config_manager/poetry.toml config_manager/poe
 RUN cd /app/config_manager/ && \
     poetry install --no-root
 
-COPY queue_manager/pyproject.toml queue_manager/poetry.toml queue_manager/poetry.lock /app/queue_manager/
+COPY ml_worker/pyproject.toml ml_worker/poetry.toml ml_worker/poetry.lock /app/ml_worker/
 
-RUN cd /app/queue_manager/ && \
+RUN cd /app/ml_worker/ && \
     poetry install --no-root
 
 COPY app_server/pyproject.toml app_server/poetry.toml app_server/poetry.lock /app/app_server/
@@ -20,9 +20,9 @@ RUN cd /app/app_server/ && \
     poetry install --no-root
 
 COPY config_manager/config_manager /app/config_manager/config_manager
-COPY queue_manager/queue_manager /app/queue_manager/queue_manager
+COPY ml_worker/ml_worker /app/ml_worker/ml_worker
 RUN cd /app/config_manager && poetry install && \
-    cd /app/queue_manager && poetry install
+    cd /app/ml_worker && poetry install
 
 EXPOSE 9000
 WORKDIR /app/app_server

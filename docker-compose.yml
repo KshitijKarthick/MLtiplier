@@ -12,7 +12,7 @@ services:
       - "9000:9000"
     volumes:
       - ./config_manager/config_manager:/app/config_manager/config_manager
-      - ./queue_manager/queue_manager:/app/queue_manager/queue_manager
+      - ./ml_worker/ml_worker:/app/ml_worker/ml_worker
       - ./app_server/app_server:/app/app_server/app_server
       - ./app_server/logs:/logs
   web_server:
@@ -47,7 +47,6 @@ services:
       - web
     volumes:
       - ./config_manager/config_manager:/app/config_manager/config_manager
-      - ./queue_manager/queue_manager:/app/queue_manager/queue_manager
       - ./ml_worker/ml_worker:/app/ml_worker/ml_worker
       - ./ml_worker/model_resources:/app/ml_worker/model_resources
       - ./ml_worker/stub:/app/ml_worker/stub

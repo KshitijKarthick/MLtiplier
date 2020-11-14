@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import AnyStr, Optional, Tuple
+from typing import AnyStr, Optional
 
 
 @dataclass
@@ -17,23 +17,6 @@ class MLWorkerInput:
 @dataclass
 class MLWorkerResult:
     pass
-
-
-@dataclass
-class JobStatus:
-    job_id: int
-    status: AnyStr
-    error_message: Optional[AnyStr] = None
-    queue_length: Optional[int] = None
-    input: Optional[MLWorkerInput] = None
-    result: Optional[MLWorkerResult] = None
-
-
-@dataclass
-class Job:
-    job_id: int
-    payload: Optional[MLWorkerInput] = None
-    retries: int = 0
 
 
 @dataclass

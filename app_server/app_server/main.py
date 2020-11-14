@@ -3,12 +3,16 @@ from typing import AnyStr
 
 from fastapi import FastAPI, HTTPException
 from starlette.middleware.cors import CORSMiddleware
+from redis import Redis
+from rq import Queue
 
-from queue_manager.app_server import AppServerQueueManager
 from config_manager.commons import (
     DEBUG_MODE,
 )
+from config_manager.redis import HOST
 from config_manager.utils import get_logger
+
+from ml_worker.main import run
 
 from config_manager.schema import (
     JobStatusState,
@@ -17,8 +21,8 @@ from config_manager.schema import (
     MLWorkerInput,
 )
 
+queue = Queue(connection=Redis(HOST))
 app = FastAPI()
-redis_job_manager = AppServerQueueManager()
 logger = get_logger()
 
 if DEBUG_MODE:
@@ -30,22 +34,27 @@ async def render_status():
     return {"msg": "Ok"}
 
 
-@app.get("/api/job/status/{job_id}")
+@app.get("/api/job/status")
 async def check_job_status(job_id: AnyStr):
-    job_status = redis_job_manager.status(job_id=job_id)
-    if job_status.status == JobStatusState.FAILURE:
+    job_id = job_id.decode("utf-8")
+    logger.info(f"Job Id status: {job_id} - {type(job_id)}")
+    job = queue.fetch_job(job_id=job_id)
+    if not job or job.is_failed:
         raise HTTPException(
             status_code=503,
-            detail=f"Fatal error occurred: " f"{job_status.error_message}",
+            detail=f"Fatal error occurred: {job.id}",
         )
-    return asdict(HTTPStatusOutput(job_id=job_status.job_id, status=job_status.status))
+    elif not job.is_finished:
+        return asdict(HTTPStatusOutput(job_id=job_id, status=JobStatusState.PENDING))
+    else:
+        return asdict(HTTPStatusOutput(job_id=job_id, status=JobStatusState.SUCCESS))
 
 
 @app.post("/api/job")
 async def anime_image_resize():
     try:
-        job_id = redis_job_manager.submit(MLWorkerInput())
-        return asdict(HTTPJobOutput(job_id=job_id))
+        job = queue.enqueue(run, asdict(MLWorkerInput()))
+        return asdict(HTTPJobOutput(job_id=job.id))
     except HTTPException:
         raise
     except BaseException as err:
