@@ -1,23 +1,23 @@
-FROM python:3.7.9-buster
+FROM python:3.8.6-buster
 
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN pip install --upgrade pip wheel poetry setuptools
 
-COPY config_manager/pyproject.toml config_manager/poetry.toml config_manager/poetry.lock /app/config_manager/
+COPY backend_services/config_manager/requirements.txt \
+    backend_services/config_manager/setup.py /app/config_manager/
 
 RUN cd /app/config_manager/ && \
-    poetry install --no-root
+    pip install -r requirements.txt
 
-COPY ml_worker/poetry.lock ml_worker/pyproject.toml ml_worker/poetry.toml /app/ml_worker/
+COPY backend_services/ml_worker/requirements.txt /app/ml_worker/requirements.txt
 
 RUN cd /app/ml_worker/ && \
-    poetry install --no-root
+    pip install -r requirements.txt
 
-COPY config_manager/config_manager /app/config_manager/config_manager
-RUN cd /app/config_manager && poetry install
+COPY backend_services/config_manager/config_manager /app/config_manager/config_manager
+RUN cd /app/config_manager && pip install -e .
 
 WORKDIR /app/ml_worker
 
-# CMD ["rq", "worker", "-u", "redis://redis:6379"]
-CMD ["python", "-c", "import time;time.sleep(100000)"]
+CMD ["rq", "worker", "-u", "redis://redis:6379"]

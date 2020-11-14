@@ -4,7 +4,7 @@ from typing import AnyStr
 from fastapi import FastAPI, HTTPException
 from starlette.middleware.cors import CORSMiddleware
 from redis import Redis
-from rq import Queue
+from rq import Queue, Retry
 
 from config_manager.commons import (
     DEBUG_MODE,
@@ -37,7 +37,6 @@ async def render_status():
 @app.get("/api/job/status")
 async def check_job_status(job_id: AnyStr):
     job_id = job_id.decode("utf-8")
-    logger.info(f"Job Id status: {job_id} - {type(job_id)}")
     job = queue.fetch_job(job_id=job_id)
     if not job or job.is_failed:
         raise HTTPException(
@@ -47,13 +46,18 @@ async def check_job_status(job_id: AnyStr):
     elif not job.is_finished:
         return asdict(HTTPStatusOutput(job_id=job_id, status=JobStatusState.PENDING))
     else:
-        return asdict(HTTPStatusOutput(job_id=job_id, status=JobStatusState.SUCCESS))
+        return asdict(
+            HTTPStatusOutput(job_id=job_id, status=JobStatusState.SUCCESS, result=job.result))
 
 
 @app.post("/api/job")
 async def anime_image_resize():
     try:
-        job = queue.enqueue(run, asdict(MLWorkerInput()))
+        job = queue.enqueue(
+            run, MLWorkerInput(),
+            retry=Retry(max=3, interval=20),
+            result_ttl=60 * 60 * 2
+        )
         return asdict(HTTPJobOutput(job_id=job.id))
     except HTTPException:
         raise

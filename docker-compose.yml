@@ -11,10 +11,10 @@ services:
     ports:
       - "9000:9000"
     volumes:
-      - ./config_manager/config_manager:/app/config_manager/config_manager
-      - ./ml_worker/ml_worker:/app/ml_worker/ml_worker
-      - ./app_server/app_server:/app/app_server/app_server
-      - ./app_server/logs:/logs
+      - ./backend_services/config_manager/config_manager:/app/config_manager/config_manager
+      - ./backend_services/ml_worker/ml_worker:/app/ml_worker/ml_worker
+      - ./backend_services/app_server/app_server:/app/app_server/app_server
+      - ./backend_services/app_server/logs:/logs
   web_server:
     image: nginx
     networks:
@@ -24,9 +24,9 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./web_server/nginx.conf:/etc/nginx/nginx.conf
+      - ./backend_services/web_server/nginx.conf:/etc/nginx/nginx.conf
 #      - ./dist:/usr/share/nginx/html/
-      - ./web_server/logs:/usr/share/nginx/logs/
+      - ./backend_services/web_server/logs:/usr/share/nginx/logs/
 
   redis:
     image: redis
@@ -46,11 +46,11 @@ services:
     networks:
       - web
     volumes:
-      - ./config_manager/config_manager:/app/config_manager/config_manager
-      - ./ml_worker/ml_worker:/app/ml_worker/ml_worker
-      - ./ml_worker/model_resources:/app/ml_worker/model_resources
-      - ./ml_worker/stub:/app/ml_worker/stub
-      - ./ml_worker/logs:/logs
+      - ./backend_services/config_manager/config_manager:/app/config_manager/config_manager
+      - ./backend_services/ml_worker/ml_worker:/app/ml_worker/ml_worker
+      - ./backend_services/ml_worker/model_resources:/app/ml_worker/model_resources
+      - ./backend_services/ml_worker/stub:/app/ml_worker/stub
+      - ./backend_services/ml_worker/logs:/logs
 networks:
   web:
     external: true

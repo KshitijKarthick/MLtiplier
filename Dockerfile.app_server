@@ -4,27 +4,26 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 RUN pip install --upgrade pip wheel poetry setuptools
 
-COPY config_manager/pyproject.toml config_manager/poetry.toml config_manager/poetry.lock /app/config_manager/
+COPY backend_services/config_manager/requirements.txt backend_services/config_manager/setup.py /app/config_manager/
 
 RUN cd /app/config_manager/ && \
-    poetry install --no-root
+    pip install -r requirements.txt
 
-COPY ml_worker/pyproject.toml ml_worker/poetry.toml ml_worker/poetry.lock /app/ml_worker/
+COPY backend_services/ml_worker/requirements.txt backend_services/ml_worker/setup.py /app/ml_worker/
 
 RUN cd /app/ml_worker/ && \
-    poetry install --no-root
+    pip install -r requirements.txt
 
-COPY app_server/pyproject.toml app_server/poetry.toml app_server/poetry.lock /app/app_server/
+COPY backend_services/app_server/requirements.txt /app/app_server/requirements.txt
 
 RUN cd /app/app_server/ && \
-    poetry install --no-root
+    pip install -r requirements.txt
 
-COPY config_manager/config_manager /app/config_manager/config_manager
-COPY ml_worker/ml_worker /app/ml_worker/ml_worker
-RUN cd /app/config_manager && poetry install && \
-    cd /app/ml_worker && poetry install
+COPY backend_services/config_manager/config_manager /app/config_manager/config_manager
+COPY backend_services/ml_worker/ml_worker /app/ml_worker/ml_worker
+RUN cd /app/config_manager && pip install -e . && \
+    cd /app/ml_worker && pip install -e .
 
 EXPOSE 9000
 WORKDIR /app/app_server
-
 CMD ["uvicorn", "app_server.main:app", "--host", "0.0.0.0", "--port", "9000"]

@@ -21,7 +21,7 @@ class MLWorkerResult:
 
 @dataclass
 class HTTPStatusOutput:
-    job_id: int
+    job_id: AnyStr
     status: AnyStr
     result: Optional[MLWorkerResult] = None
 
