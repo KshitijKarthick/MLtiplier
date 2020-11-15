@@ -47,16 +47,20 @@ async def check_job_status(job_id: AnyStr):
         return asdict(HTTPStatusOutput(job_id=job_id, status=JobStatusState.PENDING))
     else:
         return asdict(
-            HTTPStatusOutput(job_id=job_id, status=JobStatusState.SUCCESS, result=job.result))
+            HTTPStatusOutput(
+                job_id=job_id, status=JobStatusState.SUCCESS, result=job.result
+            )
+        )
 
 
 @app.post("/api/job")
 async def anime_image_resize():
     try:
         job = queue.enqueue(
-            run, MLWorkerInput(),
+            run,
+            MLWorkerInput(),
             retry=Retry(max=3, interval=20),
-            result_ttl=60 * 60 * 2
+            result_ttl=60 * 60 * 2,
         )
         return asdict(HTTPJobOutput(job_id=job.id))
     except HTTPException:
