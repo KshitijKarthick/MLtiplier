@@ -33,7 +33,7 @@ services:
     networks:
       - web
     volumes:
-      - ./redis/data/:/data/
+      - ./backend_services/redis/data/:/data/
     ports:
       - "6379:6379"
 
