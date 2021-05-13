@@ -1,7 +1,7 @@
 aiofiles==0.6.0
 click==7.1.2
 fastapi==0.61.2
-pydantic==1.7.2
+pydantic==1.7.4
 python-multipart==0.0.5
 redis==3.5.3
 rq==1.6.1
