@@ -1,24 +1,35 @@
-import logging
-
+import os
 from fastapi import FastAPI
-
 from redis import Redis
 from rq import (
     Queue, Retry,
 )
 
+from backend_server import worker
 from backend_server.model import (
     JobPayload, JobStatus, JobStatusResponse, JobResponse,
 )
-from backend_server import worker
+from backend_server.utils import get_logger
 
+# Constants from environment vars
+LOG_DIR_PATH = os.environ.get('LOG_DIR_PATH')
+REDIS_HOSTNAME = os.environ.get('REDIS_HOSTNAME', '0.0.0.0')
+REDIS_PORT = os.environ.get('REDIS_PORT', 6379)
 
 app = FastAPI(
     title="MLtiplier backend server",
     docs_url="/api/docs",
     openapi_url="/api/openapi.json",
 )
-q = Queue(connection=Redis(host='0.0.0.0'))
+logger = get_logger(
+    logger_name='app-server',
+    log_dir_path=LOG_DIR_PATH
+)
+q = Queue(
+    connection=Redis(
+        host=REDIS_HOSTNAME, port=REDIS_PORT,
+    )
+)
 
 
 @app.get("/api/status")
@@ -27,11 +38,11 @@ def heartbeat():
 
 
 @app.get("/api/status/job/{job_id}")
-async def job_status(job_id: str) -> JobStatusResponse:
+def job_status(job_id: str) -> JobStatusResponse:
     payload = None
     status = JobStatus.pending
-    logging.info(f'Checking job status: {job_id}')
-    j = await q.fetch_job(job_id=job_id)
+    logger.info(f'Checking job status: {job_id}')
+    j = q.fetch_job(job_id=job_id)
     if j.is_finished:
         payload = j.result
         status = JobStatus.completed
@@ -45,9 +56,9 @@ async def job_status(job_id: str) -> JobStatusResponse:
 
 
 @app.put("/api/job")
-async def submit_job(job: JobPayload) -> JobResponse:
-    logging.info(f'Submitting a job: {job.json()}')
-    j = await q.enqueue(
+def submit_job(job: JobPayload) -> JobResponse:
+    logger.info(f'Submitting a job: {job.json()}')
+    j = q.enqueue(
         worker.run, job,
         retry=Retry(max=3, interval=60),
         result_ttl=60 * 10,

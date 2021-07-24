@@ -84,4 +84,4 @@ FROM python-base as production-worker
 COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
 COPY ./backend_server /app/backend_server
 WORKDIR /app
-CMD ["rq", "worker", "--with-scheduler", "--url", "redis://redis:6379"]
+CMD ["sh", "-c", "rq worker --with-scheduler --url redis://$REDIS_HOSTNAME:$REDIS_PORT"]

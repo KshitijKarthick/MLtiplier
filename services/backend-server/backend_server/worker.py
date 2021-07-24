@@ -1,8 +1,16 @@
+import os
 import time
 import logging
 
 from backend_server.model import (
     JobPayload, WorkerPayload,
+)
+from backend_server.utils import get_logger
+
+
+logger = get_logger(
+    logger_name='ml-worker',
+    log_dir_path=os.environ.get('LOG_DIR_PATH')
 )
 
 
