@@ -1,56 +1,40 @@
 version: '3'
 services:
-  app_server:
+  backend_server:
     build:
-      context: .
-      dockerfile: Dockerfile.app_server
+      context: ./services/backend-server
+      dockerfile: Dockerfile
     depends_on:
       - redis
     networks:
       - web
     ports:
-      - "9000:9000"
+      - "8000:8000"
     volumes:
-      - ./backend_services/config_manager/config_manager:/app/config_manager/config_manager
-      - ./backend_services/ml_worker/ml_worker:/app/ml_worker/ml_worker
-      - ./backend_services/app_server/app_server:/app/app_server/app_server
-      - ./backend_services/app_server/logs:/logs
+      - ./logs/backend-server:/app/logs
+
   web_server:
     image: nginx
     networks:
       - web
     depends_on:
-      - app_server
+      - backend_server
     ports:
-      - "80:80"
+      - "9000:80"
     volumes:
-      - ./backend_services/web_server/nginx.conf:/etc/nginx/nginx.conf
+      - ./services/web-server/nginx.conf:/etc/nginx/nginx.conf
+      - ./logs/web-server:/usr/share/nginx/logs/
 #      - ./dist:/usr/share/nginx/html/
-      - ./backend_services/web_server/logs:/usr/share/nginx/logs/
 
   redis:
     image: redis
     networks:
       - web
     volumes:
-      - ./backend_services/redis/data/:/data/
+      - ./services/queue:/data/
     ports:
       - "6379:6379"
 
-  ml_worker:
-    build:
-      context: .
-      dockerfile: Dockerfile.ml_worker
-    depends_on:
-      - redis
-    networks:
-      - web
-    volumes:
-      - ./backend_services/config_manager/config_manager:/app/config_manager/config_manager
-      - ./backend_services/ml_worker/ml_worker:/app/ml_worker/ml_worker
-      - ./backend_services/ml_worker/model_resources:/app/ml_worker/model_resources
-      - ./backend_services/ml_worker/stub:/app/ml_worker/stub
-      - ./backend_services/ml_worker/logs:/logs
 networks:
   web:
     external: true
