@@ -52,8 +52,8 @@ COPY poetry.lock pyproject.toml ./
 # install runtime deps - uses $POETRY_VIRTUALENVS_IN_PROJECT internally
 RUN poetry install --no-dev
 
-# `development` image is used during development / testing
-FROM python-base as development
+# `development-app-server` image is used during development / testing for app-server
+FROM python-base as development-app-server
 ENV FASTAPI_ENV=development
 WORKDIR $PYSETUP_PATH
 
@@ -70,11 +70,18 @@ WORKDIR /app
 EXPOSE 8000
 CMD ["uvicorn", "--reload", "backend_server.main:app"]
 
-# `production` image used for runtime
-FROM python-base as production
+# `production-app-server` image used by app-server
+FROM python-base as production-app-server
 ENV FASTAPI_ENV=production
 COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
 COPY ./backend_server /app/backend_server
 WORKDIR /app
 EXPOSE 8000
 CMD ["gunicorn", "-b", "0.0.0.0:8000","-k", "uvicorn.workers.UvicornWorker", "backend_server.main:app"]
+
+# `production-worker` image used by worker
+FROM python-base as production-worker
+COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
+COPY ./backend_server /app/backend_server
+WORKDIR /app
+CMD ["rq", "worker", "--with-scheduler", "--url", "redis://redis:6379"]

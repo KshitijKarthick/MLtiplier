@@ -1,9 +1,10 @@
 version: '3'
 services:
-  backend_server:
+  backend_app_server:
     build:
       context: ./services/backend-server
       dockerfile: Dockerfile
+      target: production-app-server
     depends_on:
       - redis
     networks:
@@ -11,14 +12,28 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./logs/backend-server:/app/logs
+      - ./logs/backend-app-server:/app/logs
+
+  backend_worker:
+    build:
+      context: ./services/backend-server
+      dockerfile: Dockerfile
+      target: production-worker
+    environment:
+      - REDIS_HOST="redis"
+    depends_on:
+      - redis
+    networks:
+      - web
+    volumes:
+      - ./logs/backend-worker:/app/logs
 
   web_server:
     image: nginx
     networks:
       - web
     depends_on:
-      - backend_server
+      - backend_app_server
     ports:
       - "9000:80"
     volumes:

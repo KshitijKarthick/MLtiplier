@@ -27,11 +27,11 @@ def heartbeat():
 
 
 @app.get("/api/status/job/{job_id}")
-def job_status(job_id: str) -> JobStatusResponse:
+async def job_status(job_id: str) -> JobStatusResponse:
     payload = None
     status = JobStatus.pending
     logging.info(f'Checking job status: {job_id}')
-    j = q.fetch_job(job_id=job_id)
+    j = await q.fetch_job(job_id=job_id)
     if j.is_finished:
         payload = j.result
         status = JobStatus.completed
@@ -45,9 +45,9 @@ def job_status(job_id: str) -> JobStatusResponse:
 
 
 @app.put("/api/job")
-def submit_job(job: JobPayload) -> JobResponse:
+async def submit_job(job: JobPayload) -> JobResponse:
     logging.info(f'Submitting a job: {job.json()}')
-    j = q.enqueue(
+    j = await q.enqueue(
         worker.run, job,
         retry=Retry(max=3, interval=60),
         result_ttl=60 * 10,
