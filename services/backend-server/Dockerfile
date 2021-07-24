@@ -76,4 +76,5 @@ ENV FASTAPI_ENV=production
 COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
 COPY ./backend_server /app/backend_server
 WORKDIR /app
-CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "backend_server.main:app"]
+EXPOSE 8000
+CMD ["gunicorn", "-b", "0.0.0.0:8000","-k", "uvicorn.workers.UvicornWorker", "backend_server.main:app"]
