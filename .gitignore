@@ -1,16 +1,11 @@
-ui/src/node_modules
-ui/__sapper__
+services/ui/src/node_modules
 venv
 
 .DS_Store
-ui/node_modules/
-ui/src/node_modules/@sapper/
-ui/yarn-error.log
-ui/__sapper__/
-yarn-error.log
-__sapper__
-ui/.DS_Store
-node_modules
+services/ui/node_modules/
+services/ui/yarn-error.log
+services/ui/yarn-error.log
+services/ui/.DS_Store
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
