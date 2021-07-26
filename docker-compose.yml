@@ -43,7 +43,7 @@ services:
     ports:
       - "9000:80"
     volumes:
-#      - ./dist:/usr/share/nginx/html/
+      - ./services/ui/dist:/usr/share/nginx/html/
       - ./logs/web-server:/usr/share/nginx/logs/
       - ./services/web-server/nginx.conf:/etc/nginx/nginx.conf
 
