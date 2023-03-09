@@ -20,7 +20,7 @@
   "dependencies": {
     "compression": "^1.7.1",
     "polka": "next",
-    "postcss": "^8.2.10",
+    "postcss": "^8.2.13",
     "sirv": "^1.0.0"
   },
   "devDependencies": {
