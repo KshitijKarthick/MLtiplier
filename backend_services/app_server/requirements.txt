@@ -6,4 +6,4 @@ python-multipart==0.0.5
 redis==3.5.3
 rq==1.6.1
 six==1.15.0
-starlette==0.13.6
+starlette==0.25.0
